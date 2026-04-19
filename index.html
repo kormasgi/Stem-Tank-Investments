@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>STEM Tank Invest</title>
+</head>
+<body>
+
+<h1>Total Investments: <span id="total">0</span></h1>
+
+<button onclick="invest()">Invest 1</button>
+
+<script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+// 🔑 PUT YOUR INFO HERE
+const supabase = createClient(
+  "https://vviuhvwxfaihpwnfdcgx.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ2aXVodnd4ZmFpaHB3bmZkY2d4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1NTI5NjksImV4cCI6MjA5MjEyODk2OX0.PfBROkhmEfziSzUm4kfCknQPtSCPkDZ7s8Y48yC9xdU"
+);
+
+// ➕ Add investment
+async function invest() {
+  await supabase.from("investments").insert([
+    { project: "A", amount: 1 }
+  ]);
+}
+
+window.invest = invest;
+
+// 🔄 Live updates
+supabase
+  .channel('realtime investments')
+  .on(
+    'postgres_changes',
+    { event: '*', schema: 'public', table: 'investments' },
+    () => {
+      updateTotal();
+    }
+  )
+  .subscribe();
+
+// 📊 Get total
+async function updateTotal() {
+  let { data } = await supabase
+    .from("investments")
+    .select("amount");
+
+  let total = data.reduce((sum, row) => sum + row.amount, 0);
+
+  document.getElementById("total").innerText = total;
+}
+
+// run once on load
+updateTotal();
+
+</script>
+
+</body>
+</html>
