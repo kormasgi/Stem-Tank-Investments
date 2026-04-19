@@ -12,13 +12,11 @@
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
-// 🔑 PUT YOUR INFO HERE
 const supabase = createClient(
   "https://vviuhvwxfaihpwnfdcgx.supabase.co",
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ2aXVodnd4ZmFpaHB3bmZkY2d4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1NTI5NjksImV4cCI6MjA5MjEyODk2OX0.PfBROkhmEfziSzUm4kfCknQPtSCPkDZ7s8Y48yC9xdU"
 );
 
-// ➕ Add investment
 async function invest() {
   await supabase.from("investments").insert([
     { project: "A", amount: 1 }
@@ -27,7 +25,6 @@ async function invest() {
 
 window.invest = invest;
 
-// 🔄 Live updates
 supabase
   .channel('realtime investments')
   .on(
@@ -39,7 +36,6 @@ supabase
   )
   .subscribe();
 
-// 📊 Get total
 async function updateTotal() {
   let { data } = await supabase
     .from("investments")
@@ -50,7 +46,6 @@ async function updateTotal() {
   document.getElementById("total").innerText = total;
 }
 
-// run once on load
 updateTotal();
 
 </script>
