@@ -8,32 +8,35 @@ const supabase = createClient(
 let currentUser = null;
 
 async function login() {
-  let code = prompt("Enter your code:");
+  let code = document.getElementById("codeInput").value;
 
   let { data } = await supabase
     .from("users")
     .select("*")
     .eq("code", code);
 
-  if (data.length === 0) {
-    alert("Invalid code");
+  if (!data || data.length === 0) {
+    document.getElementById("loginError").innerText = "Invalid code";
     return;
   }
 
   currentUser = data[0];
+
   updateBalance();
-  alert("Welcome " + currentUser.name);
+
+  // hide login screen
+  document.getElementById("loginScreen").style.display = "none";
 }
 
-login();
-
 async function invest(group, amount) {
-  if (!currentUser) return;
 
+  if (!currentUser) return;
   if (currentUser.balance < amount) {
-    alert("Not enough money!");
+    document.getElementById("error").innerText = "Not enough money!";
     return;
   }
+
+  document.getElementById("error").innerText = "";
 
   let newBalance = currentUser.balance - amount;
 
