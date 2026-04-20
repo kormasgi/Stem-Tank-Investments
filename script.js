@@ -21,6 +21,7 @@ async function login() {
   }
 
   currentUser = data[0];
+  updateBalance();
   alert("Welcome " + currentUser.name);
 }
 
@@ -53,7 +54,7 @@ async function invest(group, amount) {
   updateBalance();
 }
 
-window.invest = invest(group, amount);
+window.invest = invest;
 
 function updateBalance() {
   if (currentUser) {
