@@ -8,14 +8,14 @@ const supabase = createClient(
 let currentUser = null;
 
 async function login() {
-  let code = document.getElementById("codeInput").value;
+  const code = document.getElementById("codeInput").value;
 
-  let { data } = await supabase
+  const { data, error } = await supabase
     .from("users")
     .select("*")
     .eq("code", code);
 
-  if (!data || data.length === 0) {
+  if (error || !data || data.length === 0) {
     document.getElementById("loginError").innerText = "Invalid code";
     return;
   }
@@ -24,13 +24,14 @@ async function login() {
 
   updateBalance();
 
-  // hide login screen
   document.getElementById("loginScreen").style.display = "none";
 }
 
-async function invest(group, amount) {
+window.login = login;
 
+async function invest(group, amount) {
   if (!currentUser) return;
+
   if (currentUser.balance < amount) {
     document.getElementById("error").innerText = "Not enough money!";
     return;
@@ -38,7 +39,7 @@ async function invest(group, amount) {
 
   document.getElementById("error").innerText = "";
 
-  let newBalance = currentUser.balance - amount;
+  const newBalance = currentUser.balance - amount;
 
   await supabase
     .from("users")
@@ -54,6 +55,7 @@ async function invest(group, amount) {
   ]);
 
   currentUser.balance = newBalance;
+
   updateBalance();
 }
 
@@ -61,17 +63,16 @@ window.invest = invest;
 
 function updateBalance() {
   if (currentUser) {
-    document.getElementById("balance").innerText = currentUser.balance;
+    document.getElementById("balance").innerText =
+      currentUser.balance.toLocaleString();
   }
 }
 
-updateBalance()
-
 supabase
-  .channel('realtime investments')
+  .channel("realtime investments")
   .on(
-    'postgres_changes',
-    { event: '*', schema: 'public', table: 'investments' },
+    "postgres_changes",
+    { event: "*", schema: "public", table: "investments" },
     () => {
       updateLeaderboard();
     }
@@ -79,7 +80,7 @@ supabase
   .subscribe();
 
 async function updateLeaderboard() {
-  let { data } = await supabase
+  const { data } = await supabase
     .from("investments")
     .select("*");
 
