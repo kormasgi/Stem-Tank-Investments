@@ -61,7 +61,7 @@ function updateBalance() {
 
 updateBalance()
 
-window.invest = invest;
+window.invest = invest(group, amount);
 
 supabase
   .channel('realtime investments')
