@@ -53,6 +53,8 @@ async function invest(group, amount) {
   updateBalance();
 }
 
+window.invest = invest(group, amount);
+
 function updateBalance() {
   if (currentUser) {
     document.getElementById("balance").innerText = currentUser.balance;
@@ -61,15 +63,13 @@ function updateBalance() {
 
 updateBalance()
 
-window.invest = invest(group, amount);
-
 supabase
   .channel('realtime investments')
   .on(
     'postgres_changes',
     { event: '*', schema: 'public', table: 'investments' },
     () => {
-      updateTotal();
+      updateLeaderboard();
     }
   )
   .subscribe();
@@ -101,4 +101,4 @@ async function updateLeaderboard() {
   document.getElementById("leaderboard").innerHTML = html;
 }
 
-updateTotal();
+updateLeaderboard();
