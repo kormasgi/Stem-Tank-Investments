@@ -4,15 +4,26 @@
   <title>STEM Tank Invest</title>
 </head>
 <body>
-  <h1>Total Investments: <span id="total">0</span></h1>
+  <h1>🏆 Leaderboard</h1>
 
-  <button onclick="invest('Group A')">Invest in A</button>
-  <button onclick="invest('Group B')">Invest in B</button>
-  <button onclick="invest('Group C')">Invest in C</button>
+  <div id="leaderboard"></div>
 
-  <script type="module" src="script.js"></script>
+  <h2>Your Balance: $<span id="balance">0</span></h2>
 
-  <h2>Balance: <span id="balance">0</span></h2>
+  <button onclick="invest('Group A', 100000)">A +100k</button>
+  <button onclick="invest('Group A', 200000)">A +200k</button>
+  <button onclick="invest('Group A', 500000)">A +500k</button>
 
+  <br><br>
+
+  <button onclick="invest('Group B', 100000)">B +100k</button>
+  <button onclick="invest('Group B', 200000)">B +200k</button>
+  <button onclick="invest('Group B', 500000)">B +500k</button>
+
+  <br><br>
+
+  <button onclick="invest('Group C', 100000)">C +100k</button>
+  <button onclick="invest('Group C', 200000)">C +200k</button>
+  <button onclick="invest('Group C', 500000)">C +500k</button>
 </body>
 </html>

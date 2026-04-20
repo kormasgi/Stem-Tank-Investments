@@ -26,15 +26,15 @@ async function login() {
 
 login();
 
-async function invest(group) {
+async function invest(group, amount) {
   if (!currentUser) return;
 
-  if (currentUser.balance <= 0) {
-    alert("No money left!");
+  if (currentUser.balance < amount) {
+    alert("Not enough money!");
     return;
   }
 
-  let newBalance = currentUser.balance - 1;
+  let newBalance = currentUser.balance - amount;
 
   await supabase
     .from("users")
@@ -42,9 +42,9 @@ async function invest(group) {
     .eq("code", currentUser.code);
 
   await supabase.from("investments").insert([
-    { 
+    {
       group_name: group,
-      amount: 1,
+      amount: amount,
       user: currentUser.code
     }
   ]);
@@ -59,6 +59,8 @@ function updateBalance() {
   }
 }
 
+updateBalance()
+
 window.invest = invest;
 
 supabase
@@ -72,7 +74,7 @@ supabase
   )
   .subscribe();
 
-async function updateTotal() {
+async function updateLeaderboard() {
   let { data } = await supabase
     .from("investments")
     .select("*");
@@ -86,12 +88,17 @@ async function updateTotal() {
     totals[row.group_name] += row.amount;
   });
 
-  let text = "";
-  for (let group in totals) {
-    text += group + ": " + totals[group] + "<br>";
-  }
+  let sorted = Object.entries(totals).sort((a, b) => b[1] - a[1]);
 
-  document.getElementById("total").innerHTML = text;
+  let html = "";
+
+  sorted.forEach(([group, total], index) => {
+    html += `<div>
+      ${index + 1}. ${group} — $${total.toLocaleString()}
+    </div>`;
+  });
+
+  document.getElementById("leaderboard").innerHTML = html;
 }
 
 updateTotal();
