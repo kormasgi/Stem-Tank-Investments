@@ -46,10 +46,18 @@ async function invest(group, amount) {
     .update({ balance: newBalance })
     .eq("code", currentUser.code);
 
-  let { data: groupData } = await supabase
+  const groupName = group.replace("Group ", "").trim();
+
+  let { data: groupData, error } = await supabase
     .from("groups")
     .select("*")
-    .eq("name", group.replace("Group ", ""));
+    .eq("name", groupName);
+
+  if (error || !groupData || groupData.length === 0) {
+    console.log("Group not found:", groupName);
+    document.getElementById("error").innerText = "Group error";
+    return;
+  }
 
   let groupRow = groupData[0];
 
@@ -58,7 +66,7 @@ async function invest(group, amount) {
   await supabase
     .from("groups")
     .update({ balance: newGroupBalance })
-    .eq("name", group.replace("Group ", ""));
+    .eq("id", groupRow.id);
 
   await supabase.from("investments").insert([
     {
