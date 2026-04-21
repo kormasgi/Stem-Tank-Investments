@@ -2,7 +2,7 @@ import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
 const supabase = createClient(
   "https://vviuhvwxfaihpwnfdcgx.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ2aXVodnd4ZmFpaHB3bmZkY2d4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1NTI5NjksImV4cCI6MjA5MjEyODk2OX0.PfBROkhmEfziSzUm4kfCknQPtSCPkDZ7s8Y48yC9xdU"
+  "YOUR_ANON_KEY_HERE"
 );
 
 let currentUser = null;
@@ -29,6 +29,20 @@ async function login() {
 
 window.login = login;
 
+function investFromInput() {
+  const groupLetter = document.getElementById("groupSelect").value;
+  const amount = parseInt(document.getElementById("amountInput").value);
+
+  if (!amount || amount <= 0) {
+    document.getElementById("error").innerText = "Enter a valid amount";
+    return;
+  }
+
+  invest("Group " + groupLetter, amount);
+}
+
+window.investFromInput = investFromInput;
+
 async function invest(group, amount) {
   if (!currentUser) return;
 
@@ -54,13 +68,11 @@ async function invest(group, amount) {
     .eq("name", groupName);
 
   if (error || !groupData || groupData.length === 0) {
-    console.log("Group not found:", groupName);
     document.getElementById("error").innerText = "Group error";
     return;
   }
 
   let groupRow = groupData[0];
-
   let newGroupBalance = groupRow.balance + amount;
 
   await supabase
@@ -105,7 +117,7 @@ async function updateLeaderboard() {
   const { data } = await supabase
     .from("groups")
     .select("*");
-    
+
   let sorted = data.sort((a, b) => b.balance - a.balance);
 
   let html = "";
@@ -118,4 +130,5 @@ async function updateLeaderboard() {
 
   document.getElementById("leaderboard").innerHTML = html;
 }
+
 updateLeaderboard();

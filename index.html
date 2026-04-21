@@ -4,51 +4,60 @@
   <title>STEM Tank Invest</title>
 </head>
 <body>
-  <h1>🏆 Leaderboard</h1>
 
-  <div id="leaderboard"></div>
+<h1>🏆 Leaderboard</h1>
+<div id="leaderboard"></div>
 
-  <h2>Your Balance: $<span id="balance">0</span></h2>
+<h2>Your Balance: $<span id="balance">0</span></h2>
 
-  <p id="error" style="color:red;"></p>
+<p id="error" style="color:red;"></p>
 
-  <button onclick="invest('Group A', 100000)">A +100k</button>
-  <button onclick="invest('Group A', 200000)">A +200k</button>
-  <button onclick="invest('Group A', 500000)">A +500k</button>
+<hr>
 
+<h2>Make Investment</h2>
+
+<label>Choose Group:</label>
+<select id="groupSelect">
+  <option value="A">Group A</option>
+  <option value="B">Group B</option>
+  <option value="C">Group C</option>
+</select>
+
+<br><br>
+
+<label>Amount:</label>
+<select id="amountInput">
+  <option value="100000">100,000</option>
+  <option value="200000">200,000</option>
+  <option value="500000">500,000</option>
+</select>
+
+<br><br>
+
+<button onclick="investFromInput()">Invest</button>
+
+<div id="loginScreen" style="
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:black;
+  color:white;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  z-index:1000;
+">
+  <h1>Enter Your Code</h1>
+  <input id="codeInput" placeholder="Enter code" style="font-size:20px; padding:10px;">
   <br><br>
+  <button onclick="login()">Enter</button>
+  <p id="loginError" style="color:red;"></p>
+</div>
 
-  <button onclick="invest('Group B', 100000)">B +100k</button>
-  <button onclick="invest('Group B', 200000)">B +200k</button>
-  <button onclick="invest('Group B', 500000)">B +500k</button>
+<script type="module" src="script.js"></script>
 
-  <br><br>
-
-  <button onclick="invest('Group C', 100000)">C +100k</button>
-  <button onclick="invest('Group C', 200000)">C +200k</button>
-  <button onclick="invest('Group C', 500000)">C +500k</button>
-
-  <div id="loginScreen" style="
-    position:fixed;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    background:black;
-    color:white;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    align-items:center;
-    z-index:1000;
-  ">
-    <h1>Enter Your Code</h1>
-    <input id="codeInput" placeholder="Enter code" style="font-size:20px; padding:10px;">
-    <br><br>
-    <button onclick="login()">Enter</button>
-    <p id="loginError" style="color:red;"></p>
-  </div>
-
-  <script type="module" src="script.js"></script>
 </body>
 </html>
