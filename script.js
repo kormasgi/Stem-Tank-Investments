@@ -6,44 +6,45 @@ const supabase = createClient(
 );
 
 let currentUser = null;
+let selectedGroup = null;
+
+function selectGroup(group) {
+  selectedGroup = group;
+
+  document.getElementById("groupScreen").style.display = "none";
+  document.getElementById("loginScreen").style.display = "flex";
+}
+
+window.selectGroup = selectGroup;
 
 async function login() {
   const code = document.getElementById("codeInput").value;
 
-  const { data, error } = await supabase
+  const { data } = await supabase
     .from("users")
     .select("*")
     .eq("code", code);
 
-  if (error || !data || data.length === 0) {
+  if (!data || data.length === 0) {
     document.getElementById("loginError").innerText = "Invalid code";
     return;
   }
 
   currentUser = data[0];
 
-  updateBalance();
-
   document.getElementById("loginScreen").style.display = "none";
+  document.getElementById("app").style.display = "block";
+
+  document.getElementById("currentGroup").innerText =
+    "Investing in Group " + selectedGroup;
+
+  updateBalance();
+  updateLeaderboard();
 }
 
 window.login = login;
 
-function investFromInput() {
-  const groupLetter = document.getElementById("groupSelect").value;
-  const amount = parseInt(document.getElementById("amountInput").value);
-
-  if (!amount || amount <= 0) {
-    document.getElementById("error").innerText = "Enter a valid amount";
-    return;
-  }
-
-  invest("Group " + groupLetter, amount);
-}
-
-window.investFromInput = investFromInput;
-
-async function invest(group, amount) {
+async function invest(amount) {
   if (!currentUser) return;
 
   if (currentUser.balance < amount) {
@@ -60,17 +61,10 @@ async function invest(group, amount) {
     .update({ balance: newBalance })
     .eq("code", currentUser.code);
 
-  const groupName = group.replace("Group ", "").trim();
-
-  let { data: groupData, error } = await supabase
+  let { data: groupData } = await supabase
     .from("groups")
     .select("*")
-    .eq("name", groupName);
-
-  if (error || !groupData || groupData.length === 0) {
-    document.getElementById("error").innerText = "Group error";
-    return;
-  }
+    .eq("name", selectedGroup);
 
   let groupRow = groupData[0];
   let newGroupBalance = groupRow.balance + amount;
@@ -82,7 +76,7 @@ async function invest(group, amount) {
 
   await supabase.from("investments").insert([
     {
-      group_name: group,
+      group_name: selectedGroup,
       amount: amount,
       user: currentUser.code
     }
@@ -96,39 +90,28 @@ async function invest(group, amount) {
 window.invest = invest;
 
 function updateBalance() {
-  if (currentUser) {
-    document.getElementById("balance").innerText =
-      currentUser.balance.toLocaleString();
-  }
+  document.getElementById("balance").innerText =
+    currentUser.balance.toLocaleString();
 }
 
 supabase
-  .channel("realtime groups")
+  .channel("groups")
   .on(
     "postgres_changes",
     { event: "*", schema: "public", table: "groups" },
-    () => {
-      updateLeaderboard();
-    }
+    updateLeaderboard
   )
   .subscribe();
 
 async function updateLeaderboard() {
-  const { data } = await supabase
-    .from("groups")
-    .select("*");
+  const { data } = await supabase.from("groups").select("*");
 
   let sorted = data.sort((a, b) => b.balance - a.balance);
 
   let html = "";
-
-  sorted.forEach((group, index) => {
-    html += `<div>
-      ${index + 1}. Group ${group.name} — $${group.balance.toLocaleString()}
-    </div>`;
+  sorted.forEach((g, i) => {
+    html += `${i + 1}. Group ${g.name} — $${g.balance.toLocaleString()}<br>`;
   });
 
   document.getElementById("leaderboard").innerHTML = html;
 }
-
-updateLeaderboard();
