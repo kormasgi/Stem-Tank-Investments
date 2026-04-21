@@ -46,6 +46,20 @@ async function invest(group, amount) {
     .update({ balance: newBalance })
     .eq("code", currentUser.code);
 
+  let { data: groupData } = await supabase
+    .from("groups")
+    .select("*")
+    .eq("name", group.replace("Group ", ""));
+
+  let groupRow = groupData[0];
+
+  let newGroupBalance = groupRow.balance + amount;
+
+  await supabase
+    .from("groups")
+    .update({ balance: newGroupBalance })
+    .eq("name", group.replace("Group ", ""));
+
   await supabase.from("investments").insert([
     {
       group_name: group,
@@ -69,10 +83,10 @@ function updateBalance() {
 }
 
 supabase
-  .channel("realtime investments")
+  .channel("realtime groups")
   .on(
     "postgres_changes",
-    { event: "*", schema: "public", table: "investments" },
+    { event: "*", schema: "public", table: "groups" },
     () => {
       updateLeaderboard();
     }
@@ -81,29 +95,19 @@ supabase
 
 async function updateLeaderboard() {
   const { data } = await supabase
-    .from("investments")
+    .from("groups")
     .select("*");
-
-  let totals = {};
-
-  data.forEach(row => {
-    if (!totals[row.group_name]) {
-      totals[row.group_name] = 0;
-    }
-    totals[row.group_name] += row.amount;
-  });
-
-  let sorted = Object.entries(totals).sort((a, b) => b[1] - a[1]);
+    
+  let sorted = data.sort((a, b) => b.balance - a.balance);
 
   let html = "";
 
-  sorted.forEach(([group, total], index) => {
+  sorted.forEach((group, index) => {
     html += `<div>
-      ${index + 1}. ${group} — $${total.toLocaleString()}
+      ${index + 1}. Group ${group.name} — $${group.balance.toLocaleString()}
     </div>`;
   });
 
   document.getElementById("leaderboard").innerHTML = html;
 }
-
 updateLeaderboard();
