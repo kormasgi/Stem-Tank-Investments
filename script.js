@@ -47,6 +47,18 @@ window.login = login;
 async function invest(amount) {
   if (!currentUser) return;
 
+  let { data: existing } = await supabase
+    .from("investments")
+    .select("*")
+    .eq("user", currentUser.code)
+    .eq("group_name", selectedGroup);
+
+  if (existing && existing.length > 0) {
+    document.getElementById("error").innerText =
+      "You already invested in this group!";
+    return;
+  }
+
   if (currentUser.balance < amount) {
     document.getElementById("error").innerText = "Not enough money!";
     return;
@@ -76,9 +88,10 @@ async function invest(amount) {
 
   await supabase.from("investments").insert([
     {
+      user: currentUser.code,
       group_name: selectedGroup,
       amount: amount,
-      user: currentUser.code
+      created_at: new Date().toISOString()
     }
   ]);
 
@@ -86,6 +99,35 @@ async function invest(amount) {
 
   updateBalance();
 }
+
+async function updateActivity() {
+  const { data } = await supabase
+    .from("investments")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(5);
+
+  let html = "<h3>Recent Activity</h3>";
+
+  data.forEach(row => {
+    html += `
+      <div>
+        User ${row.user} → Group ${row.group_name} ($${row.amount.toLocaleString()})
+      </div>
+    `;
+  });
+
+  document.getElementById("activity").innerHTML = html;
+}
+
+supabase
+  .channel("investments")
+  .on(
+    "postgres_changes",
+    { event: "*", schema: "public", table: "investments" },
+    updateActivity
+  )
+  .subscribe();
 
 window.invest = invest;
 
