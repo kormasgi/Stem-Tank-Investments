@@ -1,14 +1,16 @@
 .groupScreen{
     left: 0;
     top: 0;
-    position:fixed; 
-    width:100%; height:100%;
-    background:black; 
-    color:white;
-    display:flex; 
-    flex-direction:column;
-    justify-content:center; 
-    align-items:center;
+    position: fixed; 
+    width: 100%;
+    height: 100%;
+    background: black; 
+    color: white;
+    display: flex; 
+    flex-direction: column;
+    justify-content: center; 
+    align-items: center;
+    z-index: 3;
 }
 
 .groupScreen button {
@@ -23,14 +25,16 @@
 .loginScreen{
     left: 0;
     top: 0;
-    position:fixed;
-    width:100%; height:100%;
-    background:black;
-    color:white;
-    display:none;
-    flex-direction:column;
-    justify-content:center;
-    align-items:center;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background: black;
+    color: white;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 2;
 }
 
 .loginScreen input{
@@ -38,5 +42,6 @@
 }
 
 .app{
-    display:none;
+    display: none;
+    z-index: 1;
 }
