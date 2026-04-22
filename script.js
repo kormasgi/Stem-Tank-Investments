@@ -2,7 +2,7 @@ import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
 const supabase = createClient(
   "https://vviuhvwxfaihpwnfdcgx.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ2aXVodnd4ZmFpaHB3bmZkY2d4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1NTI5NjksImV4cCI6MjA5MjEyODk2OX0.PfBROkhmEfziSzUm4kfCknQPtSCPkDZ7s8Y48yC9xdU"
+  "YOUR_ANON_KEY_HERE"
 );
 
 let currentUser = null;
@@ -20,12 +20,12 @@ window.selectGroup = selectGroup;
 async function login() {
   const code = document.getElementById("codeInput").value;
 
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("users")
     .select("*")
     .eq("code", code);
 
-  if (!data || data.length === 0) {
+  if (error || !data || data.length === 0) {
     document.getElementById("loginError").innerText = "Invalid code";
     return;
   }
@@ -73,10 +73,15 @@ async function invest(amount) {
     .update({ balance: newBalance })
     .eq("code", currentUser.code);
 
-  let { data: groupData } = await supabase
+  let { data: groupData, error: groupError } = await supabase
     .from("groups")
     .select("*")
     .eq("name", selectedGroup);
+
+  if (groupError || !groupData || groupData.length === 0) {
+    document.getElementById("error").innerText = "Group error";
+    return;
+  }
 
   let groupRow = groupData[0];
   let newGroupBalance = groupRow.balance + amount;
@@ -86,48 +91,27 @@ async function invest(amount) {
     .update({ balance: newGroupBalance })
     .eq("id", groupRow.id);
 
-  await supabase.from("investments").insert([
-    {
-      user: currentUser.code,
-      group_name: selectedGroup,
-      amount: amount,
-      created_at: new Date().toISOString()
-    }
-  ]);
+  const { error: insertError } = await supabase
+    .from("investments")
+    .insert([
+      {
+        user: currentUser.code,
+        group_name: selectedGroup,
+        amount: amount,
+        created_at: new Date().toISOString()
+      }
+    ]);
+
+  if (insertError) {
+    console.log("Insert error:", insertError);
+    document.getElementById("error").innerText = "Database error!";
+    return;
+  }
 
   currentUser.balance = newBalance;
 
   updateBalance();
 }
-
-async function updateActivity() {
-  const { data } = await supabase
-    .from("investments")
-    .select("*")
-    .order("created_at", { ascending: false })
-    .limit(5);
-
-  let html = "<h3>Recent Activity</h3>";
-
-  data.forEach(row => {
-    html += `
-      <div>
-        User ${row.user} → Group ${row.group_name} ($${row.amount.toLocaleString()})
-      </div>
-    `;
-  });
-
-  document.getElementById("activity").innerHTML = html;
-}
-
-supabase
-  .channel("investments")
-  .on(
-    "postgres_changes",
-    { event: "*", schema: "public", table: "investments" },
-    updateActivity
-  )
-  .subscribe();
 
 window.invest = invest;
 

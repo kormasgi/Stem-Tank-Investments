@@ -1,45 +1,40 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <link rel="stylesheet" href="style.css">
   <title>STEM Tank Invest</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <div id="app" class = "app">
-    <h1>🏆 Leaderboard</h1>
-    <div id="leaderboard"></div>
+<div id="app" class="app">
+  <h1>🏆 Leaderboard</h1>
+  <div id="leaderboard"></div>
 
-    <h2>Your Balance: $<span id="balance">0</span></h2>
-    <p id="error" style="color:red;"></p>
+  <h2>Your Balance: $<span id="balance">0</span></h2>
+  <p id="error" style="color:red;"></p>
 
-    <h2 id="currentGroup"></h2>
+  <h2 id="currentGroup"></h2>
 
-    <button onclick="invest(100000)">Invest 100k</button>
-    <button onclick="invest(200000)">Invest 200k</button>
-    <button onclick="invest(500000)">Invest 500k</button>
-    <br><br>
-    <button onclick="window.location.reload()">Done</button>
-  </div>
+  <button onclick="invest(100000)">Invest 100k</button>
+  <button onclick="invest(200000)">Invest 200k</button>
+  <button onclick="invest(500000)">Invest 500k</button>
+</div>
 
-  <div id="groupScreen" class = "groupScreen">
-    <h1>Select Group</h1>
-    <button onclick="selectGroup('A')">Group A</button>
-    <button onclick="selectGroup('B')">Group B</button>
-    <button onclick="selectGroup('C')">Group C</button>
-  </div>
+<div id="groupScreen" class="groupScreen">
+  <h1>Select Group</h1>
+  <button onclick="selectGroup('A')">Group A</button>
+  <button onclick="selectGroup('B')">Group B</button>
+  <button onclick="selectGroup('C')">Group C</button>
+</div>
 
-  <div id="loginScreen" class = "loginScreen">
-    <h1>Enter Code</h1>
-    <input id="codeInput" class = "codeInput" placeholder="Code">
-    <br><br>
-    <button onclick="login()">Enter</button>
-    <p id="loginError" style="color:red;"></p>
-  </div>
+<div id="loginScreen" class="loginScreen">
+  <h1>Enter Code</h1>
+  <input id="codeInput" class="codeInput" placeholder="Code">
+  <br><br>
+  <button onclick="login()">Enter</button>
+  <p id="loginError" style="color:red;"></p>
+</div>
 
-  <div id="activity"></div>
-
-  <script type="module" src="script.js"></script>
-
+<script type="module" src="script.js"></script>
 </body>
 </html>
