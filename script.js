@@ -10,22 +10,20 @@ let selectedGroup = null;
 
 function selectGroup(group) {
   selectedGroup = group;
-
   document.getElementById("groupScreen").style.display = "none";
   document.getElementById("loginScreen").style.display = "flex";
 }
-
 window.selectGroup = selectGroup;
 
 async function login() {
-  const code = document.getElementById("codeInput").value;
+  const code = document.getElementById("codeInput").value.trim();
 
-  const { data, error } = await supabase
+  const { data } = await supabase
     .from("users")
     .select("*")
     .eq("code", code);
 
-  if (error || !data || data.length === 0) {
+  if (!data || data.length === 0) {
     document.getElementById("loginError").innerText = "Invalid code";
     return;
   }
@@ -39,7 +37,6 @@ async function login() {
     "Investing in Group " + selectedGroup;
 
   updateBalance();
-  updateLeaderboard();
 }
 
 window.login = login;
@@ -53,9 +50,9 @@ async function invest(amount) {
     .eq("user", currentUser.code)
     .eq("group_name", selectedGroup);
 
-  if (existing && existing.length > 0) {
+  if (existing.length > 0) {
     document.getElementById("error").innerText =
-      "You already invested in this group!";
+      "Already invested in this group!";
     return;
   }
 
@@ -64,8 +61,6 @@ async function invest(amount) {
     return;
   }
 
-  document.getElementById("error").innerText = "";
-
   const newBalance = currentUser.balance - amount;
 
   await supabase
@@ -73,71 +68,32 @@ async function invest(amount) {
     .update({ balance: newBalance })
     .eq("code", currentUser.code);
 
-  let { data: groupData, error: groupError } = await supabase
+  let { data: groupData } = await supabase
     .from("groups")
     .select("*")
     .eq("name", selectedGroup);
 
-  if (groupError || !groupData || groupData.length === 0) {
-    document.getElementById("error").innerText = "Group error";
-    return;
-  }
-
-  let groupRow = groupData[0];
-  let newGroupBalance = groupRow.balance + amount;
+  let group = groupData[0];
 
   await supabase
     .from("groups")
-    .update({ balance: newGroupBalance })
-    .eq("id", groupRow.id);
+    .update({ balance: group.balance + amount })
+    .eq("id", group.id);
 
-  const { error: insertError } = await supabase
-    .from("investments")
-    .insert([
-      {
-        user: currentUser.code,
-        group_name: selectedGroup,
-        amount: amount,
-        created_at: new Date().toISOString()
-      }
-    ]);
-
-  if (insertError) {
-    console.log("Insert error:", insertError);
-    document.getElementById("error").innerText = "Database error!";
-    return;
-  }
+  await supabase.from("investments").insert([
+    {
+      user: currentUser.code,
+      group_name: selectedGroup,
+      amount: amount
+    }
+  ]);
 
   currentUser.balance = newBalance;
-
   updateBalance();
 }
-
 window.invest = invest;
 
 function updateBalance() {
   document.getElementById("balance").innerText =
     currentUser.balance.toLocaleString();
-}
-
-supabase
-  .channel("groups")
-  .on(
-    "postgres_changes",
-    { event: "*", schema: "public", table: "groups" },
-    updateLeaderboard
-  )
-  .subscribe();
-
-async function updateLeaderboard() {
-  const { data } = await supabase.from("groups").select("*");
-
-  let sorted = data.sort((a, b) => b.balance - a.balance);
-
-  let html = "";
-  sorted.forEach((g, i) => {
-    html += `${i + 1}. Group ${g.name} — $${g.balance.toLocaleString()}<br>`;
-  });
-
-  document.getElementById("leaderboard").innerHTML = html;
 }
