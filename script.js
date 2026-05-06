@@ -13,7 +13,6 @@ function selectGroup(group) {
   document.getElementById("groupScreen").style.display = "none";
   document.getElementById("loginScreen").style.display = "flex";
   document.getElementById("loginScreen").innerHTML += 
-  `<p>Group: ${group}</p>`;
 }
 window.selectGroup = selectGroup;
 
