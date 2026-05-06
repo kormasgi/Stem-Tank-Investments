@@ -17,6 +17,9 @@
   <button onclick="invest(100000)">Invest 100k</button>
   <button onclick="invest(200000)">Invest 200k</button>
   <button onclick="invest(500000)">Invest 500k</button>
+  <br>
+  <br>
+  <button onclick="done()">Done!</button>
 </div>
 
 <div id="groupScreen" class="groupScreen">
@@ -46,9 +49,9 @@
 
 <div id="loginScreen" class="loginScreen">
   <h1>Enter Code</h1>
-  <input id="codeInput" placeholder="Code">
+  <input id="codeInput" placeholder="Code" class="codeInput">
   <br><br>
-  <button onclick="login()">Enter</button>
+  <button onclick="login()" class="codeEnter">Enter</button>
   <p id="loginError" style="color:red;"></p>
 </div>
 

@@ -12,6 +12,8 @@ function selectGroup(group) {
   selectedGroup = group;
   document.getElementById("groupScreen").style.display = "none";
   document.getElementById("loginScreen").style.display = "flex";
+  document.getElementById("loginScreen").innerHTML += 
+  `<p>Group: ${group}</p>`;
 }
 window.selectGroup = selectGroup;
 
@@ -34,7 +36,7 @@ async function login() {
   document.getElementById("app").style.display = "block";
 
   document.getElementById("currentGroup").innerText =
-    "Investing in Group " + selectedGroup;
+    "Investing in:  " + selectedGroup;
 
   updateBalance();
 }
@@ -97,3 +99,20 @@ function updateBalance() {
   document.getElementById("balance").innerText =
     currentUser.balance.toLocaleString();
 }
+
+function done() {
+
+  document.getElementById("app").style.display = "none";
+
+  document.getElementById("loginScreen").style.display = "flex";
+
+  document.getElementById("codeInput").value = "";
+
+  document.getElementById("error").innerText = "";
+  document.getElementById("loginError").innerText = "";
+
+  currentUser = null;
+}
+window.done = done;
+
+window.done = done;
