@@ -12,7 +12,6 @@ function selectGroup(group) {
   selectedGroup = group;
   document.getElementById("groupScreen").style.display = "none";
   document.getElementById("loginScreen").style.display = "flex";
-  document.getElementById("loginScreen").innerHTML += 
 }
 window.selectGroup = selectGroup;
 
