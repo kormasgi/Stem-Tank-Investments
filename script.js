@@ -99,20 +99,3 @@ function updateBalance() {
   document.getElementById("balance").innerText =
     currentUser.balance.toLocaleString();
 }
-
-function done() {
-
-  document.getElementById("app").style.display = "none";
-
-  document.getElementById("loginScreen").style.display = "flex";
-
-  document.getElementById("codeInput").value = "";
-
-  document.getElementById("error").innerText = "";
-  document.getElementById("loginError").innerText = "";
-
-  currentUser = null;
-}
-window.done = done;
-
-window.done = done;
